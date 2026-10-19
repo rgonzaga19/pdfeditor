@@ -1,5 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="A free, browser-based PDF editor. Add text, images, drawings, shapes, and highlights to PDF files."><meta name="theme-color" content="#f3f4f7"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Simple PDF Editor</title>
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="A free, browser-based PDF editor. Add text, images, drawings, shapes, and highlights to PDF files."><meta name="theme-color" content="#f7f6f0"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>PDF Editor — A little order for your paperwork</title>
 <link rel="icon" type="image/svg+xml" href="assets/pdf-editor-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -7,8 +7,8 @@
 <style>
 /* Layout: slim app bar, then either a landing drop zone or a three-column workspace (thumbnails | pages | edit list). */
 :root{
-  --bg:#f3f4f7; --surface:#ffffff; --line:#dde0e7; --fg:#1a1c23; --muted:#5f6675;
-  --accent:#d93a2f; --accent-fg:#ffffff; --canvas:#e4e7ed; --sel:#2f6df6; --hover:#eceef3;
+  --bg:#f7f6f0; --surface:#fffefa; --line:#dedfd4; --fg:#183a34; --muted:#637c74;
+  --accent:#284e40; --accent-fg:#ffffff; --canvas:#e9e9df; --sel:#65836a; --hover:#eff1e8;
   --shadow:0 1px 2px rgba(20,24,40,.08),0 8px 24px rgba(20,24,40,.12);
   --font-display:'Bricolage Grotesque',system-ui,sans-serif;
   --font-ui:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -70,6 +70,53 @@ svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;st
 .drop .big{height:64px;padding:0 44px;font-size:22px;border-radius:14px;font-family:var(--font-display);font-weight:700}
 .drop small{color:var(--muted)}
 .linkbtn{background:none;border:0;padding:4px 2px;color:var(--sel);font-weight:500;text-decoration:underline;text-underline-offset:3px}
+
+/* Editorial landing page */
+#app{height:100%;min-height:100vh}
+.appbar{position:sticky;top:0;z-index:50;height:76px;padding-inline:max(24px,calc((100vw - 1180px)/2));background:var(--bg);border-color:var(--line)}
+.brand{font-family:var(--font-ui);font-size:20px;color:var(--fg)}
+.brand-icon{filter:saturate(.65)}
+.landing-nav{display:flex;align-items:center;gap:28px;margin-left:auto}
+.landing-nav a{color:var(--muted);font-weight:500;text-decoration:none}
+.landing-nav a:hover{color:var(--accent)}
+.appbar:has(#btn-open:not([hidden])){padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}.appbar:has(#btn-open:not([hidden])) .landing-nav{display:none}
+#landing{display:block;padding:0 24px 76px;overflow:auto;scroll-behavior:smooth}
+.landing-inner{max-width:1180px;margin:0 auto;text-align:left;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:clamp(44px,8vw,112px);padding:64px 0 48px}
+.hero-copy{display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.eyebrow{display:flex;align-items:center;gap:10px;color:var(--fg);font-size:12px;font-weight:600;letter-spacing:.13em}
+.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#819477}
+.landing-inner h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:clamp(54px,7vw,88px);line-height:.99;letter-spacing:-.055em;max-width:650px}
+.landing-inner h1 em{color:#73896b;font-weight:400}
+.landing-inner p{font-size:18px;line-height:1.7;max-width:440px;color:var(--muted)}
+.trust-row{display:flex;gap:24px;flex-wrap:wrap;color:var(--fg);font-size:13px;margin-top:3px}
+.trust-row span{display:flex;gap:8px;align-items:center}.trust-row b{color:#758c6b;font-size:16px}
+.paper-art{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:4px;color:#6a866a}
+.paper{width:72px;height:98px;border:1px solid #d9ddd0;border-radius:4px;background:#fffefa;box-shadow:3px 4px 0 #e6e8df;padding:13px 9px;transform:rotate(-5deg);font-size:7px;letter-spacing:.12em;color:#667f6b}
+.paper:nth-of-type(2){background:#e8eeeb;transform:rotate(3deg)}.paper:nth-of-type(3){background:#f2e5d7;transform:rotate(-3deg)}.paper:nth-of-type(4){background:#e7ebdc;transform:rotate(5deg)}
+.paper i{display:block;height:2px;background:#cbd4ca;margin-top:9px}.paper-art .arrow{font-size:24px}
+.upload-card{padding:28px;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:0 18px 60px rgba(48,57,42,.045)}
+.upload-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;color:var(--fg);font-size:12px;font-weight:600;letter-spacing:.13em}
+.drop{margin:0;min-height:350px;justify-content:center;border:1px dashed #bdcbb6;border-radius:14px;background:#f5f7ef;padding:30px 20px}
+.drop .upload-glyph{width:70px;height:88px;border:1px solid #d5ddcc;border-radius:12px;background:#fffefa;box-shadow:5px 5px 0 #e5e9dd;display:grid;place-items:center;font-size:30px;transform:rotate(-7deg);color:#738b6e;margin-bottom:8px}
+.drop strong{font-size:24px;letter-spacing:-.03em}.drop small{font-size:14px;color:var(--muted)}
+.drop .big{height:54px;padding:0 26px;font:600 15px var(--font-ui);border-radius:8px}
+.linkbtn{color:var(--muted);font-size:12px}
+.processed{text-align:center;color:var(--muted);font-size:12px;margin:20px 0 2px}
+.landing-below{max-width:1180px;margin:auto;border-top:1px solid var(--line);padding-top:32px}
+.steps{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:34px;align-items:start;padding-bottom:32px}
+.section-kicker{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:600}
+.steps h2,.about-card h2,.contact-area h2{font:400 34px/1.18 Georgia,'Times New Roman',serif;letter-spacing:-.03em;color:var(--fg);margin:14px 0 0}
+.step-num{font:12px var(--font-mono);color:#798a65}.step h3{font-size:15px;margin:20px 0 7px;color:var(--fg)}.step p{font-size:13px;line-height:1.7;color:var(--muted);margin:0}
+.about-card{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:34px 40px;margin:4px 0 48px;scroll-margin-top:24px}
+.about-icon{width:50px;height:50px;border-radius:12px;background:#e7ebdc;display:grid;place-items:center;color:#617c68;font-size:23px;margin-bottom:22px}
+.about-card h2{font-size:36px;margin:0 0 8px}.about-role{font-size:14px;color:var(--fg);font-weight:500;margin:0 0 22px}.about-copy{font-size:16px;line-height:1.8;color:var(--muted);max-width:900px;margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.tags span{padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:#f7f7f1;color:var(--fg);font-size:12px}
+.contact-area{scroll-margin-top:24px;margin:0 0 48px}.contact-area h2{margin:0 0 20px}.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.contact-card{display:flex;align-items:center;gap:14px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-decoration:none;color:var(--fg)}
+.contact-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:9px;background:#f2e6d7;color:#8c6239;font-size:19px}.contact-card small{display:block;font-size:10px;letter-spacing:.12em;color:var(--muted);margin-bottom:3px}.contact-card strong{font-size:14px;font-weight:500}
+.privacy-card{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:22px}.privacy-note{padding:17px 20px;border-radius:9px;background:#edf1e6;color:var(--fg);line-height:1.7}.privacy-area h2{margin-bottom:18px}
+.site-footer{max-width:1180px;margin:22px auto 0;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+@media(max-width:900px){.landing-inner{grid-template-columns:1fr;gap:34px;padding:62px 0 52px}.hero-copy{max-width:650px}.upload-card{max-width:650px;width:100%;justify-self:center}.steps{grid-template-columns:1fr 1fr}.steps-intro{grid-column:1/-1}}
+@media(max-width:560px){.appbar{height:64px;padding-inline:18px}.landing-nav{gap:15px;font-size:12px}#landing{padding-inline:18px}.landing-inner{padding:46px 0 38px;gap:30px}.landing-inner h1{font-size:54px}.landing-inner p{font-size:16px}.upload-card{padding:15px}.drop{min-height:310px}.steps{grid-template-columns:1fr;gap:24px}.steps-intro{grid-column:auto}.about-card{padding:24px 22px}.contact-grid{grid-template-columns:1fr}.site-footer{gap:10px;flex-wrap:wrap}}
 
 /* editor */
 #editor{flex:1;min-height:0;display:flex;flex-direction:column}
@@ -203,18 +250,39 @@ svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;st
   <header class="appbar">
     <div class="brand"><img class="brand-icon" src="assets/pdf-editor-icon.svg" alt="">PDF Editor</div>
     <div class="grow"><div class="fname" id="fname"></div></div>
+    <nav class="landing-nav" aria-label="Page navigation"><a href="info.html#about">About</a><a href="info.html#privacy">Privacy</a><a href="info.html#contact">Contact</a></nav>
     <button class="btn" id="btn-open" hidden><svg class="ic" viewBox="0 0 24 24" data-ic="open"></svg><span>Open another file</span></button>
   </header>
 
   <main id="landing">
     <div class="landing-inner">
-      <h1>PDF Editor</h1>
-      <p>Add text, images, drawings, shapes and highlights to a PDF. Your file stays in this browser.</p>
-      <div class="drop" id="drop">
-        <button class="btn primary big" id="btn-select" type="button">Select PDF file</button>
-        <small>or drop a PDF here</small>
-        <button class="linkbtn" id="btn-sample" type="button">Try it with a sample statement</button>
+      <div class="hero-copy">
+        <div class="eyebrow">A LITTLE ORDER FOR YOUR PAPERWORK</div>
+        <h1>Make PDFs.<br>Neat little <em>pieces.</em></h1>
+        <p>Add text, images, drawings, shapes, and highlights in one simple workspace. Your files stay on your device.</p>
+        <div class="trust-row"><span><b>&#x1F512;</b> Files stay on your device</span><span><b>&#x2713;</b> Free. No sign-up.</span></div>
+        <div class="paper-art" aria-hidden="true"><div class="paper">YOUR PDF<i></i><i></i><i></i>01-12</div><span class="arrow">&#x2192;</span><div class="paper">PART 01<i></i><i></i>01-04</div><div class="paper">PART 02<i></i><i></i>05-08</div><div class="paper">PART 03<i></i>09-12</div></div>
       </div>
+      <section class="upload-card" aria-label="Open a PDF">
+        <div class="upload-top"><span>LET'S GET STARTED</span><span aria-hidden="true">&#x2197;</span></div>
+        <div class="drop" id="drop">
+          <div class="upload-glyph" aria-hidden="true">&#x21E7;</div>
+          <strong>Drop your PDF here</strong>
+          <small>One file at a time. You choose.</small>
+          <button class="btn primary big" id="btn-select" type="button">Choose a PDF file &rarr;</button>
+          <button class="linkbtn" id="btn-sample" type="button">Or try a sample statement</button>
+        </div>
+        <div class="processed">&#x1F512; &nbsp; Processed in your browser. Never uploaded.</div>
+      </section>
+    </div>
+    <div class="landing-below">
+      <section class="steps" aria-labelledby="steps-title">
+        <div class="steps-intro"><div class="section-kicker">LESS PAPERWORK, MORE POSSIBILITY</div><h2 id="steps-title">From a blank page to finished.<br>In three simple steps.</h2></div>
+        <div class="step"><span class="step-num">01</span><h3>Bring your PDF</h3><p>Choose a file or drop it into the workspace to get started.</p></div>
+        <div class="step"><span class="step-num">02</span><h3>Make it yours</h3><p>Add text, images, drawings, shapes, and highlights. Undo anytime.</p></div>
+        <div class="step"><span class="step-num">03</span><h3>Save your changes</h3><p>Download your edited PDF directly to your device.</p></div>
+      </section>
+      <footer class="site-footer"><div><strong>PDF Editor</strong><br><span>A small tool for a clearer day.</span></div><span>&copy; 2026 &middot; Made by Romel Gonzaga</span><a href="info.html#privacy">Your privacy matters &#x2197;</a></footer>
     </div>
   </main>
 
