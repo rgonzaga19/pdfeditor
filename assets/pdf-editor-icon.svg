@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="PDF Editor icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8483c"/>
+      <stop offset="1" stop-color="#c52f25"/>
+    </linearGradient>
+    <g id="pencil">
+      <rect x="-26" y="-18" width="26" height="36" rx="6"/>
+      <rect x="0" y="-18" width="16" height="36"/>
+      <rect x="16" y="-18" width="136" height="36"/>
+      <polygon points="152,-18 152,18 200,0"/>
+    </g>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <!-- page -->
+  <path d="M142 90H282L378 186V422H142Z" fill="#ffffff"/>
+  <path d="M282 90V186H378Z" fill="#f4cbc6"/>
+  <rect x="176" y="236" width="170" height="16" rx="8" fill="#d93a2f" opacity=".3"/>
+  <rect x="176" y="274" width="128" height="16" rx="8" fill="#d93a2f" opacity=".3"/>
+  <rect x="176" y="312" width="150" height="16" rx="8" fill="#d93a2f" opacity=".3"/>
+  <!-- pencil: red halo, then the pencil -->
+  <g transform="translate(378 244) rotate(135)">
+    <use href="#pencil" fill="#c52f25" stroke="#c52f25" stroke-width="24" stroke-linejoin="round"/>
+    <rect x="-26" y="-18" width="26" height="36" rx="6" fill="#1a1c23"/>
+    <rect x="0" y="-18" width="16" height="36" fill="#9aa1af"/>
+    <rect x="16" y="-18" width="136" height="36" fill="#ffd24a"/>
+    <rect x="16" y="-18" width="136" height="9" fill="#ffe27f"/>
+    <polygon points="152,-18 152,18 200,0" fill="#f1c9a0"/>
+    <polygon points="184,-6 184,6 200,0" fill="#1a1c23"/>
+  </g>
+</svg>
