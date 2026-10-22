@@ -154,6 +154,7 @@ svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;st
 .thumb[aria-current="true"]{color:var(--fg)}
 .stage{position:relative;min-width:0;min-height:0;background:var(--canvas);display:flex}
 .scroller{flex:1;min-width:0;overflow:auto}
+.scroller.space-pan{cursor:grab}.scroller.space-pan:active,.scroller.panning{cursor:grabbing}.scroller.panning{user-select:none}
 .pages{display:flex;flex-direction:column;align-items:center;gap:18px;padding:22px 24px 110px;min-width:max-content}
 .page{position:relative;background:#fff;box-shadow:var(--shadow);flex:none}
 .page canvas{display:block}
@@ -396,8 +397,8 @@ body{font-size:14px;line-height:1.5}.appbar{box-shadow:none;border-bottom:1px so
           <input class="pg" id="pg-num" type="text" inputmode="numeric" value="1" aria-label="Page number">
           <span class="tot" id="pg-tot">/ 1</span>
           <span class="div"></span>
-          <button class="ib" id="z-out" title="Zoom out"><svg class="ic" viewBox="0 0 24 24" data-ic="minus"></svg></button>
-          <button class="ib" id="z-in" title="Zoom in"><svg class="ic" viewBox="0 0 24 24" data-ic="plus"></svg></button>
+          <button class="ib" id="z-out" title="Zoom out (Ctrl + scroll down)"><svg class="ic" viewBox="0 0 24 24" data-ic="minus"></svg></button>
+          <button class="ib" id="z-in" title="Zoom in (Ctrl + scroll up)"><svg class="ic" viewBox="0 0 24 24" data-ic="plus"></svg></button>
           <button class="zoom" id="z-val" title="Fit to width">100%</button>
         </div>
       </div>
@@ -589,12 +590,15 @@ function trackScroll(){
   S.pages.forEach((p,i)=>{ if(p.wrap.offsetTop<=mid) cur=i; });
   if(cur!==S.cur){S.cur=cur;markCurrent(); const t=$('.thumb[aria-current="true"]'); if(t) t.scrollIntoView({block:'nearest'});}
 }
-function setZoom(z,fit){
+function setZoom(z,fit,anchor){
   z=clamp(Math.round(z*100)/100,.25,3); if(z===S.zoom) return;
-  const sc=$('#scroller'); const ratio=sc.scrollHeight?sc.scrollTop/sc.scrollHeight:0;
+  const sc=$('#scroller'), oldZoom=S.zoom;
+  const point=anchor?{x:anchor.clientX-sc.getBoundingClientRect().left,y:anchor.clientY-sc.getBoundingClientRect().top}:null;
+  const ratio=sc.scrollHeight?sc.scrollTop/sc.scrollHeight:0;
   if(S.editing) endEdit();
   S.zoom=z; sizePages(); renderItems(); updateZoomLabel();
-  sc.scrollTop=ratio*sc.scrollHeight;
+  if(point){sc.scrollLeft=(sc.scrollLeft+point.x)*(z/oldZoom)-point.x;sc.scrollTop=(sc.scrollTop+point.y)*(z/oldZoom)-point.y;}
+  else sc.scrollTop=ratio*sc.scrollHeight;
   visible.forEach(i=>ensureRender(i));
 }
 function updateZoomLabel(){ $('#z-val').textContent=Math.round(S.zoom*100)+'%'; }
@@ -917,7 +921,8 @@ $('#btn-clear').addEventListener('click',()=>{
 document.addEventListener('keydown',e=>{
   if($('#editor').hidden) return;
   const tag=(e.target.tagName||'').toLowerCase();
-  const typing=S.editing!=null||tag==='input'||tag==='select'||tag==='textarea';
+  const typing=S.editing!=null||e.target.isContentEditable||tag==='input'||tag==='select'||tag==='textarea'||tag==='button'||tag==='a';
+  if(e.code==='Space'&&!typing){ e.preventDefault(); spaceHeld=true; $('#scroller').classList.add('space-pan'); return; }
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); undo(); return; }
   if(typing) return;
   const s=selItem();
@@ -931,9 +936,27 @@ document.addEventListener('keydown',e=>{
   if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&map[e.key.toLowerCase()]){ setTool(map[e.key.toLowerCase()]); }
   if(!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()==='i') $('#in-img').click();
 });
+let spaceHeld=false;
+document.addEventListener('keyup',e=>{if(e.code==='Space'){spaceHeld=false;$('#scroller').classList.remove('space-pan');}});
+window.addEventListener('blur',()=>{spaceHeld=false;$('#scroller').classList.remove('space-pan');});
 
 /* ---------- pager ---------- */
-$('#scroller').addEventListener('scroll',trackScroll,{passive:true});
+const scroller=$('#scroller');
+scroller.addEventListener('scroll',trackScroll,{passive:true});
+scroller.addEventListener('wheel',e=>{
+  if(!e.ctrlKey||$('#editor').hidden||!S.pdf)return;
+  e.preventDefault();
+  setZoom(S.zoom*(e.deltaY<0?1.1:1/1.1),false,e);
+},{passive:false});
+scroller.addEventListener('pointerdown',e=>{
+  if(!spaceHeld||e.button!==0)return;
+  e.preventDefault();e.stopPropagation();
+  const startX=e.clientX,startY=e.clientY,left=scroller.scrollLeft,top=scroller.scrollTop;
+  scroller.classList.add('panning');
+  const move=ev=>{scroller.scrollLeft=left-(ev.clientX-startX);scroller.scrollTop=top-(ev.clientY-startY);};
+  const finish=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',finish);scroller.classList.remove('panning');};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',finish);
+},true);
 $('#pg-prev').addEventListener('click',()=>goPage(S.cur-1));
 $('#pg-next').addEventListener('click',()=>goPage(S.cur+1));
 $('#pg-num').addEventListener('change',e=>{ const n=parseInt(e.target.value,10); if(n) goPage(n-1); else markCurrent(); });
