@@ -455,15 +455,15 @@ const FONT_CSS={Helvetica:'Arial,Helvetica,sans-serif',Times:'"Times New Roman",
 const BASELINE={Helvetica:.946,Times:.938,Courier:.867};
 const defaults={
   text:{font:'Helvetica',size:14,bold:false,italic:false,underline:false,color:'#111111',bg:null,align:'left',opacity:1},
-  draw:{stroke:'#d93a2f',sw:3,opacity:1},
-  rect:{stroke:'#d93a2f',fill:null,sw:2,opacity:1},
-  ellipse:{stroke:'#d93a2f',fill:null,sw:2,opacity:1},
-  line:{stroke:'#d93a2f',sw:2,opacity:1},
+  draw:{stroke:'#000000',sw:1,opacity:1},
+  rect:{stroke:'#000000',fill:null,sw:1,opacity:1},
+  ellipse:{stroke:'#000000',fill:null,sw:1,opacity:1},
+  line:{stroke:'#000000',sw:1,opacity:1},
   highlight:{color:'#ffe14d',opacity:.4},
   image:{opacity:1}
 };
 const NAMES={text:'Text',draw:'Drawing',rect:'Rectangle',ellipse:'Ellipse',line:'Line',highlight:'Highlight',image:'Image'};
-const S={bytes:null,name:'document.pdf',pdf:null,pages:[],zoom:1,tool:'select',sel:null,editing:null,items:[],undo:[],cur:0,counters:{},nextId:1,lastSnap:0};
+const S={bytes:null,name:'document.pdf',pdf:null,pages:[],zoom:1,tool:'select',sel:null,editing:null,items:[],undo:[],cur:0,counters:{},nextId:1,lastSnap:0,clipboard:null,pasteCount:0};
 const els=new Map();
 const visible=new Set();
 let io=null;
@@ -504,7 +504,7 @@ async function openBytes(bytes,name){
       pages.push({pdf:pg,w:vp.width,h:vp.height,rotate:pg.rotate||0,renderedZoom:0,task:null});
     }
     S.bytes=bytes; S.name=name||'document.pdf'; S.pdf=doc; S.pages=pages;
-    S.items=[]; S.undo=[]; S.sel=null; S.editing=null; S.counters={}; S.cur=0; S.tool='select';
+    S.items=[]; S.undo=[]; S.sel=null; S.editing=null; S.counters={}; S.cur=0; S.tool='select'; S.clipboard=null; S.pasteCount=0;
     $('#landing').hidden=true; $('#editor').hidden=false; $('#btn-open').hidden=false; $('#fname').textContent=S.name;
     $('#pg-tot').textContent='/ '+pages.length;
     await new Promise(r=>requestAnimationFrame(r));
@@ -685,6 +685,22 @@ function removeItem(id){
   const e=els.get(id); if(e) e.remove(); els.delete(id);
   S.items=S.items.filter(i=>i.id!==id); if(S.sel===id) S.sel=null; if(S.editing===id) S.editing=null;
   renderList(); updateFmt();
+}
+function copySelected(){
+  const it=selItem(); if(!it) return false;
+  S.clipboard=Object.assign({},it,it.pts?{pts:it.pts.map(p=>[p[0],p[1]])}:{});
+  S.pasteCount=0;
+  return true;
+}
+function pasteCopied(){
+  const src=S.clipboard; if(!src||!S.pages[src.page]) return false;
+  pushUndo(true);
+  const type=src.type;
+  S.counters[type]=(S.counters[type]||0)+1;
+  const p=S.pages[src.page], offset=16*(++S.pasteCount);
+  const it=Object.assign({},src,{id:S.nextId++,n:S.counters[type],x:clamp(src.x+offset,0,Math.max(0,p.w-src.w)),y:clamp(src.y+offset,0,Math.max(0,p.h-src.h))},src.pts?{pts:src.pts.map(p=>[p[0],p[1]])}:{});
+  S.items.push(it); mountItem(it); selectItem(it.id);
+  return true;
 }
 
 /* ---------- pointer handling ---------- */
@@ -923,6 +939,11 @@ document.addEventListener('keydown',e=>{
   const tag=(e.target.tagName||'').toLowerCase();
   const typing=S.editing!=null||e.target.isContentEditable||tag==='input'||tag==='select'||tag==='textarea'||tag==='button'||tag==='a';
   if(e.code==='Space'&&!typing){ e.preventDefault(); spaceHeld=true; $('#scroller').classList.add('space-pan'); return; }
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!typing){
+    const key=e.key.toLowerCase();
+    if(key==='c'&&selItem()){ e.preventDefault(); copySelected(); return; }
+    if(key==='v'&&S.clipboard){ e.preventDefault(); pasteCopied(); return; }
+  }
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); undo(); return; }
   if(typing) return;
   const s=selItem();
